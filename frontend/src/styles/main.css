@@ -1,0 +1,4 @@
+body { font-family: Arial, sans-serif; background:#f7f7f7; color:#111; }
+input { padding:8px; border:1px solid #ccc; border-radius:4px; }
+button { padding:8px 12px; border-radius:4px; background:#1976d2; color:#fff; border:none; cursor:pointer; }
+.card { background:#fff; border-radius:6px; padding:12px; box-shadow:0 1px 3px rgba(0,0,0,0.08); }

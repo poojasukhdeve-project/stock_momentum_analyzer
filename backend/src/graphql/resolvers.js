@@ -20,21 +20,33 @@ function fmtDate(d) {
 /**
  * Small fallback summary generator (best-effort) when getMomentumSummary returns null.
  * Accepts docs array (ascending sorted).
+ *
+ * Important: returnPct is expressed as **percentage** (e.g. 12.34 means 12.34%),
+ * so it matches the units returned by getMomentumSummary which returns percentages.
  */
 function fallbackSummaryFromDocs(docs = []) {
   if (!Array.isArray(docs) || docs.length === 0) return null;
+
   const asc = docs.slice(); // assume already ascending by date
   const firstClose = Number(asc[0].close);
   const lastClose = Number(asc[asc.length - 1].close);
-  const returnPct = (firstClose && !Number.isNaN(firstClose)) ? (lastClose - firstClose) / firstClose : null;
 
+  // returnPct as percentage to match getMomentumSummary which returns percent
+  const returnPct = (firstClose && !Number.isNaN(firstClose))
+    ? ((lastClose - firstClose) / firstClose) * 100
+    : null;
+
+  // compute day-by-day returns (fractions)
   const returns = [];
   for (let i = 1; i < asc.length; i++) {
     const prev = Number(asc[i - 1].close);
     const cur = Number(asc[i].close);
-    if (prev) returns.push((cur - prev) / prev);
+    if (prev && !Number.isNaN(prev) && !Number.isNaN(cur)) {
+      returns.push((cur - prev) / prev);
+    }
   }
 
+  // average gain / loss (fractions)
   let avgGain = null, avgLoss = null;
   if (returns.length > 0) {
     const gains = returns.filter(r => r > 0);
@@ -43,14 +55,17 @@ function fallbackSummaryFromDocs(docs = []) {
     avgLoss = losses.length ? (losses.reduce((a,b)=>a+b,0) / losses.length) : 0;
   }
 
+  // simple mean/std z-like score (fractional returns)
   const mean = returns.length ? (returns.reduce((a,b)=>a+b,0) / returns.length) : 0;
   const variance = returns.length ? (returns.reduce((a,b)=>a + Math.pow(b-mean,2),0) / returns.length) : 0;
   const stdev = Math.sqrt(variance);
+  // score uses same approach as other fallback: mean/stdev if possible
   const score = stdev ? (mean / stdev) : (mean * 100);
 
+  // label using percentage thresholds: 0.5% ~ 0.005 fraction in previous logic
   let label = 'Neutral';
   if (returnPct !== null) {
-    label = returnPct > 0.005 ? 'Bullish' : (returnPct < -0.005 ? 'Bearish' : 'Neutral');
+    label = returnPct > 0.5 ? 'Bullish' : (returnPct < -0.5 ? 'Bearish' : 'Neutral');
   }
 
   return {
@@ -93,6 +108,7 @@ module.exports = {
   momentum: async ({ symbol, range }) => {
     try {
       if (!symbol) return null;
+
       // set a sane default range (90) if invalid or missing
       range = parseInt(range, 10);
       if (!range || Number.isNaN(range) || range <= 0) range = 90;
@@ -114,16 +130,13 @@ module.exports = {
       if (!summary) {
         console.log(`[graphql momentum] getMomentumSummary returned null for ${symbol}, using fallback`);
         summary = fallbackSummaryFromDocs(docs);
-      } else {
-        // ensure start/end dates are Date types (or parseable)
-        // nothing to do here; we'll format below
       }
 
       if (!summary) return null;
 
+      // ensure returned dates are strings 'YYYY-MM-DD'
       return {
         ...summary,
-        // make sure returned dates are strings 'YYYY-MM-DD'
         startDate: fmtDate(summary.startDate),
         endDate: fmtDate(summary.endDate)
       };

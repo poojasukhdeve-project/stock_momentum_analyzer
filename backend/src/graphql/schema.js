@@ -14,7 +14,8 @@ module.exports = buildSchema(`
     symbol: String!
     startDate: String!
     endDate: String!
-    returnPct: Float      # fraction (e.g. 0.036 == 3.6%)
+    # returnPct is expressed as PERCENTAGE (e.g. 3.6 means 3.6%)
+    returnPct: Float
     score: Float
     avgGain: Float
     avgLoss: Float
@@ -26,4 +27,3 @@ module.exports = buildSchema(`
     momentum(symbol: String!, range: Int): MomentumSummary
   }
 `);
-

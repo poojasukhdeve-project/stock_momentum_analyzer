@@ -1,5 +1,7 @@
 // frontend/src/components/PriceChart.jsx
+
 import React, { useMemo } from 'react';
+
 import {
   LineChart,
   Line,
@@ -8,89 +10,337 @@ import {
   Tooltip,
   CartesianGrid,
   ResponsiveContainer,
+  Legend,
 } from 'recharts';
 
 /**
  * PriceChart
+ *
  * Props:
- *  - candles: array of candle objects from backend, e.g.
- *      { date: "2025-01-02T00:00:00.000Z", open: 130, high:132, low:129, close:131, volume:90000000 }
+ * - candles:
+ *   [
+ *     {
+ *       date,
+ *       open,
+ *       high,
+ *       low,
+ *       close,
+ *       volume,
+ *       sma20,
+ *       ema20
+ *     }
+ *   ]
  */
-export default function PriceChart({ candles = [] }) {
-  // Normalize and prepare data (memoized)
-  const data = useMemo(() => {
-    if (!Array.isArray(candles) || candles.length === 0) return [];
 
-    // Map to { date, close } and ensure date is a string 'YYYY-MM-DD'
+export default function PriceChart({
+  candles = []
+}) {
+
+  /* =========================================
+     PREPARE CHART DATA
+  ========================================= */
+
+  const data = useMemo(() => {
+
+    if (
+      !Array.isArray(candles) ||
+      candles.length === 0
+    ) {
+      return [];
+    }
+
     const mapped = candles
-      .map((c) => {
-        const rawDate = c.date ? new Date(c.date) : null;
-        const dateStr = rawDate && !Number.isNaN(rawDate)
-          ? rawDate.toISOString().slice(0, 10)
-          : (c.date ? String(c.date).slice(0, 10) : 'N/A');
+
+      .map(c => {
+
+        // -----------------------------
+        // SAFE DATE PARSING
+        // -----------------------------
+
+        const rawDate =
+          c.date
+            ? new Date(c.date)
+            : null;
+
+        const isValidDate =
+          rawDate &&
+          !Number.isNaN(
+            rawDate.getTime()
+          );
+
+        const dateStr =
+          isValidDate
+            ? rawDate
+                .toISOString()
+                .slice(0, 10)
+            : 'N/A';
+
+        // -----------------------------
+        // SAFE NUMBER PARSING
+        // -----------------------------
+
+        const close =
+          Number(c.close);
+
+        const sma20 =
+          c.sma20 != null
+            ? Number(c.sma20)
+            : null;
+
+        const ema20 =
+          c.ema20 != null
+            ? Number(c.ema20)
+            : null;
 
         return {
-          // keep original numeric close for domain calculations
-          close: c.close != null ? Number(c.close) : null,
+
           date: dateStr,
+
+          close:
+            !Number.isNaN(close)
+              ? close
+              : null,
+
+          sma20:
+            !Number.isNaN(sma20)
+              ? sma20
+              : null,
+
+          ema20:
+            !Number.isNaN(ema20)
+              ? ema20
+              : null,
+
           _rawDate: rawDate
+
         };
       })
-      // filter out invalid items
-      .filter((d) => d.close !== null && d._rawDate && !Number.isNaN(d._rawDate))
-      // sort ascending by raw date so chart X axis flows left -> right
-      .sort((a, b) => a._rawDate - b._rawDate)
-      // remove helper prop before passing to recharts
-      .map(({ _rawDate, ...rest }) => rest);
+
+      // -----------------------------
+      // FILTER INVALID DATA
+      // -----------------------------
+
+      .filter(
+        d =>
+          d.close !== null &&
+          d._rawDate &&
+          !Number.isNaN(
+            d._rawDate.getTime()
+          )
+      )
+
+      // -----------------------------
+      // SORT BY DATE
+      // -----------------------------
+
+      .sort(
+        (a, b) =>
+          a._rawDate -
+          b._rawDate
+      )
+
+      // -----------------------------
+      // REMOVE TEMP FIELD
+      // -----------------------------
+
+      .map(
+        ({
+          _rawDate,
+          ...rest
+        }) => rest
+      );
 
     return mapped;
+
   }, [candles]);
 
-  // tooltip formatter
-  const tooltipFormatter = (value, name, props) => {
-    if (value === null || value === undefined) return ['—', name];
-    return [Number(value).toFixed(2), 'Close'];
-  };
+  /* =========================================
+     EMPTY STATE
+  ========================================= */
 
-  const tooltipLabelFormatter = (label) => label; // label is dateStr already
+  if (
+    !data ||
+    data.length === 0
+  ) {
 
-  // Determine if we have data
-  if (!data || data.length === 0) {
     return (
-      <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
+
+      <div
+        style={{
+          height: 400,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#666',
+          fontSize: 16
+        }}
+      >
         No chart data available
       </div>
+
     );
   }
 
+  /* =========================================
+     UI
+  ========================================= */
+
   return (
-    <div style={{ height: 400 }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e9e9e9" />
-          <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+
+    <div
+      style={{
+        width: '100%',
+        height: 400
+      }}
+    >
+
+      <ResponsiveContainer
+        width="100%"
+        height="100%"
+      >
+
+        <LineChart
+          data={data}
+          margin={{
+            top: 20,
+            right: 20,
+            left: 10,
+            bottom: 10
+          }}
+        >
+
+          {/* GRID */}
+
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="#e5e7eb"
+          />
+
+          {/* LEGEND */}
+
+          <Legend />
+
+          {/* X AXIS */}
+
+          <XAxis
+            dataKey="date"
+            tick={{
+              fontSize: 12
+            }}
+            minTickGap={20}
+          />
+
+          {/* Y AXIS */}
+
           <YAxis
-            tick={{ fontSize: 12 }}
-            // let recharts auto-calc domain, add small padding
-            domain={['dataMin', 'dataMax']}
-            allowDataOverflow={false}
+            tick={{
+              fontSize: 12
+            }}
+            domain={[
+              'auto',
+              'auto'
+            ]}
+            allowDataOverflow={
+              false
+            }
+            tickFormatter={
+              value =>
+                `$${value}`
+            }
           />
+
+          {/* TOOLTIP */}
+
           <Tooltip
-            formatter={tooltipFormatter}
-            labelFormatter={tooltipLabelFormatter}
-            contentStyle={{ borderRadius: 6 }}
+            formatter={(
+              value,
+              name
+            ) => [
+
+              `$${Number(
+                value
+              ).toFixed(2)}`,
+
+              name
+
+            ]}
+            labelFormatter={
+              label =>
+                `Date: ${label}`
+            }
+            contentStyle={{
+              borderRadius:
+                '10px',
+
+              border:
+                '1px solid #ddd'
+            }}
           />
+
+          {/* CLOSE PRICE */}
+
           <Line
             type="monotone"
             dataKey="close"
-            stroke="#4f46e5"        // nice indigo-ish color
+            stroke="#4f46e5"
             strokeWidth={2}
-            dot={{ r: 3 }}
-            activeDot={{ r: 6 }}
-            connectNulls={false}
+            dot={false}
+            activeDot={{
+              r: 5
+            }}
+            name="Close"
+            animationDuration={
+              800
+            }
+            connectNulls={
+              false
+            }
           />
+
+          {/* SMA20 */}
+
+          <Line
+            type="monotone"
+            dataKey="sma20"
+            stroke="#facc15"
+            strokeWidth={2}
+            dot={false}
+            activeDot={{
+              r: 4
+            }}
+            name="SMA20"
+            animationDuration={
+              800
+            }
+            connectNulls={
+              false
+            }
+          />
+
+          {/* EMA20 */}
+
+          <Line
+            type="monotone"
+            dataKey="ema20"
+            stroke="#9333ea"
+            strokeWidth={2}
+            dot={false}
+            activeDot={{
+              r: 4
+            }}
+            name="EMA20"
+            animationDuration={
+              800
+            }
+            connectNulls={
+              false
+            }
+          />
+
         </LineChart>
+
       </ResponsiveContainer>
+
     </div>
   );
 }

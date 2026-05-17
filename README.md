@@ -387,6 +387,7 @@ stock_momentum_analyzer/
 │   │   └── App.jsx
 │
 └── README.md
+```
 
 ---
 # ▶️ Installation Guide

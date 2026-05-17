@@ -24,7 +24,6 @@ const DEFAULT_SYMBOLS = [
   'GOOGL'
 ];
 
-// latest date available in dataset
 const LATEST_DATASET_DATE =
   '2026-01-20';
 
@@ -149,9 +148,9 @@ export default function DashboardPage({
         let summaryUrl =
           `${API}/api/stocks/${symbolEsc}/summary`;
 
-        // -----------------------------
-        // CUSTOM DATE RANGE
-        // -----------------------------
+        /* =====================================
+           CUSTOM DATE RANGE
+        ===================================== */
 
         if (
           fromDate &&
@@ -181,9 +180,9 @@ export default function DashboardPage({
 
         } else {
 
-          // ---------------------------
-          // RANGE BUTTONS
-          // ---------------------------
+          /* ===================================
+             RANGE BUTTONS
+          =================================== */
 
           const latest =
             new Date(
@@ -207,9 +206,9 @@ export default function DashboardPage({
             `?range=${range}`;
         }
 
-        // -----------------------------
-        // FETCH BOTH APIs
-        // -----------------------------
+        /* =====================================
+           FETCH BOTH APIs
+        ===================================== */
 
         const [
           candlesRes,
@@ -221,12 +220,28 @@ export default function DashboardPage({
 
         if (!mounted) return;
 
+                console.log(
+          'API RESPONSE:',
+          candlesRes.data
+        );
+
         const candlesData =
           Array.isArray(
-            candlesRes.data
+            candlesRes.data?.candles
           )
+            ? candlesRes.data.candles
+
+            : Array.isArray(
+                candlesRes.data
+              )
             ? candlesRes.data
+
             : [];
+
+        console.log(
+          'Candles:',
+          candlesData
+        );
 
         setCandles(candlesData);
 
@@ -345,19 +360,29 @@ export default function DashboardPage({
       date: c.date,
 
       open:
-        Number(c.open),
+      c.open != null
+        ? Number(c.open)
+        : null,
 
       high:
-        Number(c.high),
+      c.high != null
+        ? Number(c.high)
+        : null,
 
       low:
-        Number(c.low),
+      c.low != null
+        ? Number(c.low)
+        : null,
 
       close:
-        Number(c.close),
+      c.close != null
+        ? Number(c.close)
+        : null,
 
       volume:
-        Number(c.volume),
+        c.volume != null
+        ? Number(c.volume)
+        : 0,
 
       sma20:
         c.sma20 != null
@@ -385,24 +410,28 @@ export default function DashboardPage({
   const styles = {
 
     container: {
-      maxWidth: 1200,
+      maxWidth: 1320,
       margin: '0 auto',
-      padding: 20,
+      padding: 14,
       fontFamily:
-        'Arial, sans-serif'
+        'Arial, sans-serif',
+      background: '#f8fafc'
     },
 
     header: {
       display: 'flex',
       alignItems: 'flex-start',
-      gap: 30,
+      justifyContent:
+        'space-between',
+      gap: 18,
       flexWrap: 'wrap'
     },
 
     title: {
-      fontSize: 38,
-      fontWeight: 700,
-      lineHeight: 1
+      fontSize: 42,
+      fontWeight: 800,
+      lineHeight: 1,
+      color: '#111827'
     },
 
     controls: {
@@ -422,17 +451,18 @@ export default function DashboardPage({
     },
 
     select: {
-      padding: '8px 10px',
-      borderRadius: 6,
+      padding: '10px 12px',
+      borderRadius: 8,
       border:
-        '1px solid #ddd'
+        '1px solid #d1d5db',
+      background: '#fff'
     },
 
     button: active => ({
 
-      padding: '8px 14px',
+      padding: '10px 16px',
 
-      borderRadius: 8,
+      borderRadius: 10,
 
       border: active
         ? '2px solid #111827'
@@ -450,55 +480,87 @@ export default function DashboardPage({
 
       cursor: 'pointer',
 
-      fontWeight: 600,
+      fontWeight: 700,
 
       transition: '0.2s'
     }),
 
     analyzeBtn: {
-      padding: '8px 14px',
-      borderRadius: 8,
+      padding: '10px 18px',
+      borderRadius: 10,
       border: 'none',
       background: '#2563eb',
       color: '#fff',
       cursor: 'pointer',
-      fontWeight: 600
+      fontWeight: 700
     },
 
     grid: {
       display: 'grid',
       gridTemplateColumns:
-        '360px 1fr',
-      gap: 20,
+        '420px 1fr',
+      gap: 18,
       marginTop: 20
     },
 
     card: {
+
       border:
         '1px solid #e5e7eb',
-      borderRadius: 10,
-      padding: 16,
-      background: '#fff'
+
+      borderRadius: 14,
+
+      padding: 20,
+
+      background: '#fff',
+
+      boxShadow:
+        '0 1px 3px rgba(0,0,0,0.06)'
     },
 
     chartBox: {
+
       border:
         '1px solid #e5e7eb',
-      borderRadius: 10,
-      padding: 12,
-      background: '#fff'
+
+      borderRadius: 14,
+
+      padding: 20,
+
+      background: '#fff',
+
+      boxShadow:
+        '0 1px 3px rgba(0,0,0,0.06)'
+    },
+
+    compareTitle: {
+      marginTop: 20,
+      marginBottom: 12,
+      fontSize: 20,
+      fontWeight: 700,
+      color: '#111827'
     },
 
     compareRow: {
-      marginTop: 16,
+
       display: 'flex',
+
       justifyContent:
         'space-between',
+
+      gap: 12,
+
       border:
-        '1px solid #eee',
-      borderRadius: 10,
-      padding: 12,
-      background: '#fff'
+        '1px solid #e5e7eb',
+
+      borderRadius: 14,
+
+      padding: 16,
+
+      background: '#fff',
+
+      boxShadow:
+        '0 1px 3px rgba(0,0,0,0.06)'
     }
   };
 
@@ -526,8 +588,9 @@ export default function DashboardPage({
 
           <div
             style={{
-              marginTop: 8,
-              color: '#666'
+              marginTop: 10,
+              color: '#6b7280',
+              fontSize: 18
             }}
           >
             AI-Driven Trend Scanner ·
@@ -610,6 +673,7 @@ export default function DashboardPage({
                 e.target.value
               )
             }
+            style={styles.select}
           />
 
           <input
@@ -620,6 +684,7 @@ export default function DashboardPage({
                 e.target.value
               )
             }
+            style={styles.select}
           />
 
           <button
@@ -692,6 +757,16 @@ export default function DashboardPage({
 
           </div>
 
+          {/* COMPARISON TITLE */}
+
+          <h3
+            style={
+              styles.compareTitle
+            }
+          >
+            Market Comparison (Return %)
+          </h3>
+
           {/* COMPARISON */}
 
           <div
@@ -709,13 +784,15 @@ export default function DashboardPage({
                   }
                   style={{
                     textAlign:
-                      'center'
+                      'center',
+                    flex: 1
                   }}
                 >
 
                   <div
                     style={{
-                      fontWeight: 700
+                      fontWeight: 700,
+                      fontSize: 22
                     }}
                   >
                     {stock.symbol}
@@ -728,7 +805,9 @@ export default function DashboardPage({
                           ? '#16a34a'
                           : '#dc2626',
 
-                      fontWeight: 600
+                      fontWeight: 700,
+                      fontSize: 28,
+                      marginTop: 6
                     }}
                   >
 
@@ -752,7 +831,7 @@ export default function DashboardPage({
             <div
               style={{
                 color: 'crimson',
-                marginTop: 10
+                marginTop: 12
               }}
             >
               {error}

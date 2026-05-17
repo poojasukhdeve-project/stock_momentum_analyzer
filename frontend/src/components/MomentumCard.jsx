@@ -2,12 +2,10 @@
 
 import React from 'react';
 
-/**
- * Format percentage safely
- * Backend already sends real percentage values
- * Example:
- * 71.2 -> 71.20%
- */
+/* =========================================
+   HELPERS
+========================================= */
+
 function formatPct(v) {
 
   if (
@@ -21,10 +19,10 @@ function formatPct(v) {
   return `${Number(v).toFixed(2)}%`;
 }
 
-/**
- * Format normal numbers
- */
-function formatNum(v, digits = 2) {
+function formatNum(
+  v,
+  digits = 2
+) {
 
   if (
     v === null ||
@@ -37,9 +35,34 @@ function formatNum(v, digits = 2) {
   return Number(v).toFixed(digits);
 }
 
-/**
- * Format date safely
- */
+function formatMoney(v) {
+
+  if (
+    v === null ||
+    v === undefined ||
+    Number.isNaN(v)
+  ) {
+    return '—';
+  }
+
+  return `$${Number(v).toFixed(2)}`;
+}
+
+function formatVolume(v) {
+
+  if (
+    v === null ||
+    v === undefined ||
+    Number.isNaN(v)
+  ) {
+    return '—';
+  }
+
+  return `${(
+    Number(v) / 1000000
+  ).toFixed(2)}M`;
+}
+
 function formatDate(d) {
 
   if (!d) return '—';
@@ -62,32 +85,44 @@ function formatDate(d) {
     .slice(0, 10);
 }
 
+/* =========================================
+   COMPONENT
+========================================= */
+
 export default function MomentumCard({
   summary
 }) {
 
-  // -----------------------------------
-  // NO DATA
-  // -----------------------------------
+  /* =====================================
+     EMPTY
+  ===================================== */
 
   if (summary === null) {
 
     return (
+
       <div style={styles.empty}>
-        <h3 style={{ marginTop: 0 }}>
+
+        <h3
+          style={{
+            marginTop: 0
+          }}
+        >
           Summary
         </h3>
 
         <div>
           Summary not available
         </div>
+
       </div>
+
     );
   }
 
-  // -----------------------------------
-  // LOADING
-  // -----------------------------------
+  /* =====================================
+     LOADING
+  ===================================== */
 
   if (!summary) {
 
@@ -98,9 +133,9 @@ export default function MomentumCard({
     );
   }
 
-  // -----------------------------------
-  // SAFE VALUES
-  // -----------------------------------
+  /* =====================================
+     SAFE VALUES
+  ===================================== */
 
   const symbol =
     summary.symbol ?? 'N/A';
@@ -126,9 +161,31 @@ export default function MomentumCard({
     summary.endDate ??
     summary.end_date;
 
-  // -----------------------------------
-  // TREND COLORS
-  // -----------------------------------
+  /* =====================================
+     EXTRA METRICS
+  ===================================== */
+
+  const currentPrice =
+    summary.currentPrice;
+
+  const rsi14 =
+    summary.rsi14;
+
+  const avgVolume =
+    summary.avgVolume;
+
+  const high52 =
+    summary.high52;
+
+  const low52 =
+    summary.low52;
+
+  const trend =
+    summary.trend ?? label;
+
+  /* =====================================
+     TREND COLOR
+  ===================================== */
 
   const trendColor =
     label === 'Bullish'
@@ -136,6 +193,10 @@ export default function MomentumCard({
       : label === 'Bearish'
       ? '#dc2626'
       : '#ca8a04';
+
+  /* =====================================
+     UI
+  ===================================== */
 
   return (
 
@@ -149,14 +210,15 @@ export default function MomentumCard({
           justifyContent:
             'space-between',
           alignItems: 'center',
-          marginBottom: 16
+          marginBottom: 18
         }}
       >
 
         <h3
           style={{
             margin: 0,
-            fontSize: 20
+            fontSize: 32,
+            fontWeight: 800
           }}
         >
           {symbol}
@@ -164,13 +226,19 @@ export default function MomentumCard({
 
         <div
           style={{
-            background: trendColor,
+            background:
+              trendColor,
+
             color: '#fff',
+
             padding:
-              '4px 10px',
+              '6px 14px',
+
             borderRadius: 20,
-            fontSize: 13,
-            fontWeight: 600
+
+            fontSize: 14,
+
+            fontWeight: 700
           }}
         >
           {label}
@@ -178,7 +246,7 @@ export default function MomentumCard({
 
       </div>
 
-      {/* GRID */}
+      {/* MAIN GRID */}
 
       <div style={styles.grid}>
 
@@ -191,7 +259,9 @@ export default function MomentumCard({
           label="Return"
           value={
             returnPct != null
-              ? formatPct(returnPct)
+              ? formatPct(
+                  returnPct
+                )
               : '—'
           }
           valueColor={
@@ -227,6 +297,63 @@ export default function MomentumCard({
 
       </div>
 
+      {/* EXTRA METRICS */}
+
+      <div style={styles.metricsGrid}>
+
+        <Metric
+          label="Current Price"
+          value={
+            formatMoney(
+              currentPrice
+            )
+          }
+        />
+
+        <Metric
+          label="RSI (14)"
+          value={
+            rsi14 != null
+              ? formatNum(rsi14)
+              : '—'
+          }
+        />
+
+        <Metric
+          label="Volume Avg"
+          value={
+            formatVolume(
+              avgVolume
+            )
+          }
+        />
+
+        <Metric
+          label="Trend"
+          value={trend}
+          color={trendColor}
+        />
+
+        <Metric
+          label="52W High"
+          value={
+            formatMoney(
+              high52
+            )
+          }
+        />
+
+        <Metric
+          label="52W Low"
+          value={
+            formatMoney(
+              low52
+            )
+          }
+        />
+
+      </div>
+
       {/* PERIOD */}
 
       <div style={styles.periodBox}>
@@ -243,7 +370,7 @@ export default function MomentumCard({
         <div
           style={{
             marginTop: 4,
-            fontWeight: 500
+            fontWeight: 600
           }}
         >
           {formatDate(startDate)}
@@ -258,7 +385,7 @@ export default function MomentumCard({
 }
 
 /* =========================================
-   SMALL INFO BOX
+   INFO BOX
 ========================================= */
 
 function InfoBox({
@@ -290,55 +417,135 @@ function InfoBox({
 }
 
 /* =========================================
+   METRIC
+========================================= */
+
+function Metric({
+  label,
+  value,
+  color
+}) {
+
+  return (
+
+    <div>
+
+      <div style={styles.metricLabel}>
+        {label}
+      </div>
+
+      <div
+        style={{
+          fontWeight: 700,
+          color:
+            color || '#111827'
+        }}
+      >
+        {value}
+      </div>
+
+    </div>
+  );
+}
+
+/* =========================================
    STYLES
 ========================================= */
 
 const styles = {
 
   card: {
-    padding: 18,
-    border: '1px solid #e5e7eb',
-    borderRadius: 12,
+
+    padding: 20,
+
+    border:
+      '1px solid #e5e7eb',
+
+    borderRadius: 14,
+
     background: '#fff',
+
     boxShadow:
       '0 1px 3px rgba(0,0,0,0.06)'
   },
 
   empty: {
+
     padding: 14,
-    border: '1px solid #ddd',
+
+    border:
+      '1px solid #ddd',
+
     borderRadius: 8,
+
     background: '#fafafa'
   },
 
   grid: {
+
     display: 'grid',
+
     gridTemplateColumns:
       '1fr 1fr',
+
     gap: 14
   },
 
   infoBox: {
-    padding: 12,
-    border: '1px solid #f1f5f9',
-    borderRadius: 10,
+
+    padding: 14,
+
+    border:
+      '1px solid #f1f5f9',
+
+    borderRadius: 12,
+
     background: '#fafafa'
   },
 
   label: {
+
     fontSize: 12,
+
     color: '#666',
+
     marginBottom: 4
   },
 
   value: {
-    fontSize: 20,
-    fontWeight: 700
+
+    fontSize: 32,
+
+    fontWeight: 800
+  },
+
+  metricsGrid: {
+
+    marginTop: 20,
+
+    display: 'grid',
+
+    gridTemplateColumns:
+      '1fr 1fr',
+
+    gap: 16
+  },
+
+  metricLabel: {
+
+    fontSize: 12,
+
+    color: '#666',
+
+    marginBottom: 4
   },
 
   periodBox: {
-    marginTop: 18,
-    paddingTop: 12,
+
+    marginTop: 20,
+
+    paddingTop: 14,
+
     borderTop:
       '1px solid #eee'
   }

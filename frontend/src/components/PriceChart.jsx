@@ -11,33 +11,17 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   Legend,
+  BarChart,
+  Bar,
+  Cell,
 } from 'recharts';
 
-/**
- * PriceChart
- *
- * Props:
- * - candles:
- *   [
- *     {
- *       date,
- *       open,
- *       high,
- *       low,
- *       close,
- *       volume,
- *       sma20,
- *       ema20
- *     }
- *   ]
- */
-
 export default function PriceChart({
-  candles = []
+  candles = [],
 }) {
 
   /* =========================================
-     PREPARE CHART DATA
+     PREPARE DATA
   ========================================= */
 
   const data = useMemo(() => {
@@ -49,99 +33,91 @@ export default function PriceChart({
       return [];
     }
 
-    const mapped = candles
+    return candles
 
-      .map(c => {
-
-        // -----------------------------
-        // SAFE DATE PARSING
-        // -----------------------------
+      .map((c) => {
 
         const rawDate =
           c.date
             ? new Date(c.date)
             : null;
 
-        const isValidDate =
+        const validDate =
           rawDate &&
           !Number.isNaN(
             rawDate.getTime()
           );
 
-        const dateStr =
-          isValidDate
-            ? rawDate
-                .toISOString()
-                .slice(0, 10)
-            : 'N/A';
-
-        // -----------------------------
-        // SAFE NUMBER PARSING
-        // -----------------------------
+        /* FIXED OPEN/CLOSE */
+        const open =
+          c.open != null
+            ? Number(c.open)
+            : null;
 
         const close =
-          Number(c.close);
-
-        const sma20 =
-          c.sma20 != null
-            ? Number(c.sma20)
+          c.close != null
+            ? Number(c.close)
             : null;
 
-        const ema20 =
-          c.ema20 != null
-            ? Number(c.ema20)
-            : null;
+        /* FIXED VOLUME */
+        let volume =
+          c.volume != null
+            ? Number(c.volume)
+            : 0;
+
+        if (
+          Number.isNaN(volume) ||
+          volume < 0
+        ) {
+          volume = 0;
+        }
 
         return {
 
-          date: dateStr,
+          date: validDate
+            ? rawDate
+                .toISOString()
+                .slice(0, 10)
+            : 'N/A',
 
-          close:
-            !Number.isNaN(close)
-              ? close
-              : null,
+          close,
+
+          open,
 
           sma20:
-            !Number.isNaN(sma20)
-              ? sma20
+            c.sma20 != null
+              ? Number(c.sma20)
               : null,
 
           ema20:
-            !Number.isNaN(ema20)
-              ? ema20
+            c.ema20 != null
+              ? Number(c.ema20)
               : null,
 
-          _rawDate: rawDate
+          volume,
+
+         volumeColor: '#3b82f6',
+
+          _rawDate: rawDate,
 
         };
       })
 
-      // -----------------------------
-      // FILTER INVALID DATA
-      // -----------------------------
-
+      /* FIXED FILTER */
       .filter(
-        d =>
-          d.close !== null &&
+        (d) =>
+          d.close != null &&
           d._rawDate &&
           !Number.isNaN(
             d._rawDate.getTime()
           )
       )
 
-      // -----------------------------
-      // SORT BY DATE
-      // -----------------------------
-
       .sort(
         (a, b) =>
           a._rawDate -
           b._rawDate
       )
-
-      // -----------------------------
-      // REMOVE TEMP FIELD
-      // -----------------------------
 
       .map(
         ({
@@ -150,29 +126,28 @@ export default function PriceChart({
         }) => rest
       );
 
-    return mapped;
-
   }, [candles]);
+
+  console.log(
+    'CHART DATA:',
+    data
+  );
 
   /* =========================================
      EMPTY STATE
   ========================================= */
 
-  if (
-    !data ||
-    data.length === 0
-  ) {
+  if (!data.length) {
 
     return (
 
       <div
         style={{
-          height: 400,
+          height: 500,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: '#666',
-          fontSize: 16
         }}
       >
         No chart data available
@@ -181,165 +156,256 @@ export default function PriceChart({
     );
   }
 
-  /* =========================================
-     UI
-  ========================================= */
-
   return (
 
     <div
       style={{
         width: '100%',
-        height: 400
+        background: '#fff',
+        borderRadius: 18,
+        padding: 20,
+        border: '1px solid #e5e7eb',
       }}
     >
 
-      <ResponsiveContainer
-        width="100%"
-        height="100%"
+      {/* =====================================
+          TITLE
+      ===================================== */}
+
+      <h3
+        style={{
+          marginBottom: 16,
+          fontSize: 22,
+          fontWeight: 700,
+          color: '#111827',
+        }}
+      >
+        Price Chart (With SMA20, EMA20)
+      </h3>
+
+      {/* =====================================
+          PRICE CHART
+      ===================================== */}
+
+      <div
+        style={{
+          width: '100%',
+          height: 420,
+        }}
       >
 
-        <LineChart
-          data={data}
-          margin={{
-            top: 20,
-            right: 20,
-            left: 10,
-            bottom: 10
+        <ResponsiveContainer width="100%" height="100%">
+
+          <LineChart
+            data={data}
+            margin={{
+              top: 10,
+              right: 20,
+              left: 10,
+              bottom: 10,
+            }}
+          >
+
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="#e5e7eb"
+            />
+
+            <Legend />
+
+            <XAxis
+              dataKey="date"
+              tick={{
+                fontSize: 12,
+              }}
+              minTickGap={35}
+            />
+
+            <YAxis
+              tick={{
+                fontSize: 12,
+              }}
+
+              domain={[
+                'auto',
+                'auto'
+              ]}
+
+              tickFormatter={
+                (value) =>
+                  `$${value}`
+              }
+            />
+
+            <Tooltip
+              formatter={(
+                value,
+                name
+              ) => [
+
+                `$${Number(
+                  value
+                ).toFixed(2)}`,
+
+                name,
+
+              ]}
+
+              labelFormatter={
+                (label) =>
+                  `Date: ${label}`
+              }
+            />
+
+            <Line
+              type="monotone"
+              dataKey="close"
+              stroke="#2563eb"
+              strokeWidth={2.5}
+              dot={false}
+              name="Close"
+            />
+
+            <Line
+              type="monotone"
+              dataKey="sma20"
+              stroke="#facc15"
+              strokeWidth={2}
+              dot={false}
+              name="SMA20"
+            />
+
+            <Line
+              type="monotone"
+              dataKey="ema20"
+              stroke="#ef4444"
+              strokeWidth={2}
+              dot={false}
+              name="EMA20"
+            />
+
+          </LineChart>
+
+        </ResponsiveContainer>
+
+      </div>
+
+      {/* =====================================
+          VOLUME CHART
+      ===================================== */}
+
+      <div
+        style={{
+          marginTop: 30,
+        }}
+      >
+
+        <h4
+          style={{
+            marginBottom: 12,
+            color: '#2563eb',
+            fontWeight: 700,
+            fontSize: 20,
           }}
         >
+          Volume
+        </h4>
 
-          {/* GRID */}
+        <div
+          style={{
+            width: '100%',
+            height: 320,
+            minHeight: 320,
+            background: '#fff',
+            display: 'block',
+          }}
+    >
 
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke="#e5e7eb"
-          />
+          <ResponsiveContainer width="100%" height={300}>
 
-          {/* LEGEND */}
+            <BarChart
+              data={data}
+              margin={{
+                top: 10,
+                right: 20,
+                left: 10,
+                bottom: 10,
+              }}
+            >
 
-          <Legend />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#f1f5f9"
+              />
 
-          {/* X AXIS */}
+              <XAxis
+                dataKey="date"
+                hide
+              />
 
-          <XAxis
-            dataKey="date"
-            tick={{
-              fontSize: 12
-            }}
-            minTickGap={20}
-          />
+              <YAxis
+                tick={{
+                  fontSize: 11,
+                }}
 
-          {/* Y AXIS */}
+                domain={[
+                  0,
+                  'dataMax'
+                ]}
 
-          <YAxis
-            tick={{
-              fontSize: 12
-            }}
-            domain={[
-              'auto',
-              'auto'
-            ]}
-            allowDataOverflow={
-              false
-            }
-            tickFormatter={
-              value =>
-                `$${value}`
-            }
-          />
+                tickFormatter={(value) =>
+                  `${(
+                    value / 1000000
+                  ).toFixed(0)}M`
+                }
+              />
 
-          {/* TOOLTIP */}
+              <Tooltip
+                formatter={(
+                  value
+                ) => [
 
-          <Tooltip
-            formatter={(
-              value,
-              name
-            ) => [
+                  `${(
+                    value /
+                    1000000
+                  ).toFixed(2)}M`,
 
-              `$${Number(
-                value
-              ).toFixed(2)}`,
+                  'Volume',
 
-              name
+                ]}
+              />
 
-            ]}
-            labelFormatter={
-              label =>
-                `Date: ${label}`
-            }
-            contentStyle={{
-              borderRadius:
-                '10px',
+              <Bar
+                dataKey="volume"
+                barSize={4}
+                radius={[2, 2, 0, 0]}
+              >
 
-              border:
-                '1px solid #ddd'
-            }}
-          />
+                {data.map(
+                  (
+                    entry,
+                    index
+                  ) => (
 
-          {/* CLOSE PRICE */}
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={
+                        entry.volumeColor
+                      }
+                    />
 
-          <Line
-            type="monotone"
-            dataKey="close"
-            stroke="#4f46e5"
-            strokeWidth={2}
-            dot={false}
-            activeDot={{
-              r: 5
-            }}
-            name="Close"
-            animationDuration={
-              800
-            }
-            connectNulls={
-              false
-            }
-          />
+                  )
+                )}
 
-          {/* SMA20 */}
+              </Bar>
 
-          <Line
-            type="monotone"
-            dataKey="sma20"
-            stroke="#facc15"
-            strokeWidth={2}
-            dot={false}
-            activeDot={{
-              r: 4
-            }}
-            name="SMA20"
-            animationDuration={
-              800
-            }
-            connectNulls={
-              false
-            }
-          />
+            </BarChart>
 
-          {/* EMA20 */}
+          </ResponsiveContainer>
 
-          <Line
-            type="monotone"
-            dataKey="ema20"
-            stroke="#9333ea"
-            strokeWidth={2}
-            dot={false}
-            activeDot={{
-              r: 4
-            }}
-            name="EMA20"
-            animationDuration={
-              800
-            }
-            connectNulls={
-              false
-            }
-          />
+        </div>
 
-        </LineChart>
-
-      </ResponsiveContainer>
+      </div>
 
     </div>
   );

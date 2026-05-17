@@ -1,24 +1,31 @@
 // backend/src/routes/stockRoutes.js
 
 const express = require('express');
+
 const router = express.Router();
 
-const StockCandle = require('../models/StockCandle');
+const StockCandle =
+  require('../models/StockCandle');
 
-const { computeIndicators } = require('../services/indicators');
+const {
+  computeIndicators
+} = require('../services/indicators');
 
 const {
   getMomentumSummary
 } = require('../utils/momentumScore');
 
-// IMPORTANT:
-// latest date available in dataset
-const LATEST_DATASET_DATE = '2026-01-20';
+/* =========================================
+   IMPORTANT
+========================================= */
 
-/**
- * Utility:
- * compute return percentage
- */
+const LATEST_DATASET_DATE =
+  '2026-01-20';
+
+/* =========================================
+   RETURN %
+========================================= */
+
 function computeReturnPctPercent(
   firstClose,
   lastClose
@@ -41,25 +48,36 @@ function computeReturnPctPercent(
 
   const pct =
     (
-      (lastClose - firstClose) /
-      firstClose
+      (
+        lastClose -
+        firstClose
+      ) / firstClose
     ) * 100;
 
-  return Math.round(pct * 100) / 100;
+  return Math.round(
+    pct * 100
+  ) / 100;
 }
 
-/**
- * Format date safely
- */
+/* =========================================
+   FORMAT DATE
+========================================= */
+
 function fmtDateToYMD(d) {
 
-  if (!d) return null;
+  if (!d) {
+    return null;
+  }
 
-  const parsed = new Date(d);
+  const parsed =
+    new Date(d);
 
   if (
-    !isNaN(parsed.getTime())
+    !isNaN(
+      parsed.getTime()
+    )
   ) {
+
     return parsed
       .toISOString()
       .slice(0, 10);
@@ -68,16 +86,22 @@ function fmtDateToYMD(d) {
   return null;
 }
 
-/**
- * Build range start date
- */
-function getRangeStartDate(range) {
+/* =========================================
+   RANGE DATE
+========================================= */
+
+function getRangeStartDate(
+  range
+) {
 
   const latest =
-    new Date(LATEST_DATASET_DATE);
+    new Date(
+      LATEST_DATASET_DATE
+    );
 
   latest.setDate(
-    latest.getDate() - range
+    latest.getDate() -
+      range
   );
 
   return latest;
@@ -89,6 +113,7 @@ function getRangeStartDate(range) {
 
 router.get(
   '/compare/list',
+
   async (req, res) => {
 
     try {
@@ -117,10 +142,12 @@ router.get(
         Number.isNaN(range) ||
         range <= 0
       ) {
+
         range = 90;
       }
 
       if (!symbols.length) {
+
         return res
           .status(400)
           .json({
@@ -130,7 +157,9 @@ router.get(
       }
 
       const fromDate =
-        getRangeStartDate(range);
+        getRangeStartDate(
+          range
+        );
 
       const results = [];
 
@@ -139,12 +168,18 @@ router.get(
         const candles =
           await StockCandle
             .find({
+
               symbol: sym,
+
               date: {
-                $gte: fromDate
+                $gte:
+                  fromDate
               }
+
             })
-            .sort({ date: 1 })
+            .sort({
+              date: 1
+            })
             .lean();
 
         if (
@@ -153,20 +188,30 @@ router.get(
         ) {
 
           results.push({
+
             symbol: sym,
+
             returnPct: null,
+
             sma20: null,
+
             ema20: null,
+
             rsi14: null,
+
             startDate: null,
+
             endDate: null
+
           });
 
           continue;
         }
 
         const indicators =
-          computeIndicators(candles);
+          computeIndicators(
+            candles
+          );
 
         const firstClose =
           Number(
@@ -229,10 +274,13 @@ router.get(
                 candles.length - 1
               ].date
             )
+
         });
       }
 
-      return res.json(results);
+      return res.json(
+        results
+      );
 
     } catch (err) {
 
@@ -244,7 +292,8 @@ router.get(
       return res
         .status(500)
         .json({
-          message: 'Server error'
+          message:
+            'Server error'
         });
     }
   }
@@ -256,19 +305,23 @@ router.get(
 
 router.get(
   '/:symbol',
+
   async (req, res) => {
 
     try {
 
       const symbol =
-        req.params.symbol.toUpperCase();
+        req.params.symbol
+          .toUpperCase();
 
       const {
         from,
         to
       } = req.query;
 
-      const q = { symbol };
+      const q = {
+        symbol
+      };
 
       q.date = {};
 
@@ -280,7 +333,9 @@ router.get(
       } else {
 
         q.date.$gte =
-          getRangeStartDate(365);
+          getRangeStartDate(
+            365
+          );
       }
 
       if (to) {
@@ -292,52 +347,75 @@ router.get(
       const docs =
         await StockCandle
           .find(q)
-          .sort({ date: 1 })
+          .sort({
+            date: 1
+          })
           .lean();
-      
 
       const indicators =
-  computeIndicators(docs);
+        computeIndicators(
+          docs
+        );
 
-const candles =
+     const candles =
   indicators.map(d => ({
 
     date:
-      fmtDateToYMD(d.date),
+      fmtDateToYMD(
+        d.date
+      ),
 
     open:
-      Number(d.open),
+      d.open != null
+        ? Number(d.open)
+        : 0,
 
     high:
-      Number(d.high),
+      d.high != null
+        ? Number(d.high)
+        : 0,
 
     low:
-      Number(d.low),
+      d.low != null
+        ? Number(d.low)
+        : 0,
 
     close:
-      Number(d.close),
+      d.close != null
+        ? Number(d.close)
+        : 0,
 
     volume:
-      Number(d.volume),
+      d.volume != null
+        ? Number(d.volume)
+        : 0,
 
     sma20:
       d.sma20 != null
-        ? Number(d.sma20)
+        ? Number(
+            d.sma20
+          )
         : null,
 
     ema20:
       d.ema20 != null
-        ? Number(d.ema20)
+        ? Number(
+            d.ema20
+          )
         : null,
 
     rsi14:
       d.rsi14 != null
-        ? Number(d.rsi14)
+        ? Number(
+            d.rsi14
+          )
         : null
 
-  }));    
+}));
 
-      return res.json(candles);
+      return res.json(
+        candles
+      );
 
     } catch (err) {
 
@@ -359,12 +437,14 @@ const candles =
 
 router.get(
   '/:symbol/summary',
+
   async (req, res) => {
 
     try {
 
       const symbol =
-        req.params.symbol.toUpperCase();
+        req.params.symbol
+          .toUpperCase();
 
       let range =
         parseInt(
@@ -377,21 +457,30 @@ router.get(
         Number.isNaN(range) ||
         range <= 0
       ) {
+
         range = 90;
       }
 
       const fromDate =
-        getRangeStartDate(range);
+        getRangeStartDate(
+          range
+        );
 
       const candles =
         await StockCandle
           .find({
+
             symbol,
+
             date: {
-              $gte: fromDate
+              $gte:
+                fromDate
             }
+
           })
-          .sort({ date: 1 })
+          .sort({
+            date: 1
+          })
           .lean();
 
       console.log(
@@ -402,11 +491,24 @@ router.get(
         !candles ||
         candles.length === 0
       ) {
-        return res.json(null);
+
+        return res.json(
+          null
+        );
       }
 
+      /* =====================================
+         INDICATORS
+      ===================================== */
+
       const indicators =
-        computeIndicators(candles);
+        computeIndicators(
+          candles
+        );
+
+      /* =====================================
+         MOMENTUM SUMMARY
+      ===================================== */
 
       let summary =
         getMomentumSummary(
@@ -414,7 +516,10 @@ router.get(
           indicators
         );
 
-      // fallback summary
+      /* =====================================
+         FALLBACK SUMMARY
+      ===================================== */
+
       if (!summary) {
 
         const firstClose =
@@ -445,23 +550,28 @@ router.get(
 
           const prev =
             Number(
-              candles[i - 1].close
+              candles[i - 1]
+                .close
             );
 
           const cur =
             Number(
-              candles[i].close
+              candles[i]
+                .close
             );
 
           if (prev) {
 
             returns.push(
-              (cur - prev) / prev
+              (
+                cur - prev
+              ) / prev
             );
           }
         }
 
         let avgGain = 0;
+
         let avgLoss = 0;
 
         const gains =
@@ -471,64 +581,92 @@ router.get(
 
         const losses =
           returns
-            .filter(r => r < 0)
-            .map(Math.abs);
+            .filter(
+              r => r < 0
+            )
+            .map(
+              Math.abs
+            );
 
         if (gains.length) {
 
           avgGain =
             gains.reduce(
-              (a, b) => a + b,
+              (
+                a,
+                b
+              ) => a + b,
               0
-            ) / gains.length;
+            ) /
+            gains.length;
         }
 
         if (losses.length) {
 
           avgLoss =
             losses.reduce(
-              (a, b) => a + b,
+              (
+                a,
+                b
+              ) => a + b,
               0
-            ) / losses.length;
+            ) /
+            losses.length;
         }
 
         const mean =
           returns.length
             ? returns.reduce(
-                (a, b) => a + b,
+                (
+                  a,
+                  b
+                ) => a + b,
                 0
-              ) / returns.length
+              ) /
+              returns.length
             : 0;
 
         const variance =
           returns.length
             ? returns.reduce(
-                (a, b) =>
+                (
+                  a,
+                  b
+                ) =>
+
                   a +
                   Math.pow(
-                    b - mean,
+                    b -
+                      mean,
                     2
                   ),
+
                 0
-              ) / returns.length
+              ) /
+              returns.length
             : 0;
 
         const stdev =
-          Math.sqrt(variance);
+          Math.sqrt(
+            variance
+          );
 
         const score =
           stdev
-            ? mean / stdev
+            ? mean /
+              stdev
             : mean * 100;
 
-        let label = 'Neutral';
+        let label =
+          'Neutral';
 
         if (
           returnPct != null
         ) {
 
           const frac =
-            returnPct / 100;
+            returnPct /
+            100;
 
           label =
             frac > 0.005
@@ -543,7 +681,8 @@ router.get(
           symbol,
 
           startDate:
-            candles[0].date,
+            candles[0]
+              .date,
 
           endDate:
             candles[
@@ -562,11 +701,15 @@ router.get(
         };
       }
 
-      // normalize return %
+      /* =====================================
+         NORMALIZE RETURN %
+      ===================================== */
+
       if (
         summary.returnPct !==
           undefined &&
-        summary.returnPct !== null
+        summary.returnPct !==
+          null
       ) {
 
         if (
@@ -591,10 +734,98 @@ router.get(
         }
       }
 
+      /* =====================================
+         LAST INDICATOR
+      ===================================== */
+
       const lastInd =
         indicators[
           indicators.length - 1
         ] || {};
+
+      /* =====================================
+         EXTRA ANALYTICS
+      ===================================== */
+
+      const currentPrice =
+        candles.length
+          ? Number(
+              candles[
+                candles.length - 1
+              ].close
+            )
+          : null;
+
+      const avgVolume =
+        candles.length
+          ? candles.reduce(
+              (
+                sum,
+                c
+              ) =>
+
+                sum +
+                Number(
+                  c.volume || 0
+                ),
+
+              0
+            ) /
+            candles.length
+          : null;
+
+      const closes =
+        candles.map(c =>
+          Number(c.close)
+        );
+
+      const high52 =
+        closes.length
+          ? Math.max(
+              ...closes
+            )
+          : null;
+
+      const low52 =
+        closes.length
+          ? Math.min(
+              ...closes
+            )
+          : null;
+
+      /* =====================================
+         TREND
+      ===================================== */
+
+      let trend =
+        'Neutral';
+
+      if (
+        summary.returnPct !=
+          null
+      ) {
+
+        if (
+          summary.returnPct >
+          10
+        ) {
+
+          trend =
+            'Bullish';
+
+        } else if (
+          summary.returnPct <
+          -10
+        ) {
+
+          trend =
+            'Bearish';
+        }
+      }
+
+      /* =====================================
+         FINAL OUTPUT
+      ===================================== */
 
       const out = {
 
@@ -611,25 +842,38 @@ router.get(
           ),
 
         sma20:
-          lastInd.sma20 != null
+          lastInd.sma20 !=
+          null
             ? Number(
                 lastInd.sma20
               )
             : null,
 
         ema20:
-          lastInd.ema20 != null
+          lastInd.ema20 !=
+          null
             ? Number(
                 lastInd.ema20
               )
             : null,
 
         rsi14:
-          lastInd.rsi14 != null
+          lastInd.rsi14 !=
+          null
             ? Number(
                 lastInd.rsi14
               )
-            : null
+            : null,
+
+        currentPrice,
+
+        avgVolume,
+
+        high52,
+
+        low52,
+
+        trend
       };
 
       return res.json(out);
@@ -648,4 +892,5 @@ router.get(
   }
 );
 
-module.exports = router;
+module.exports =
+  router;

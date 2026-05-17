@@ -387,3 +387,32 @@ stock_momentum_analyzer/
 │   │   └── App.jsx
 │
 └── README.md
+
+---
+# ▶️ Installation Guide
+
+## Clone Repository
+
+```bash
+git clone <repository-url>
+```
+
+---
+
+## Backend Setup
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+---
+
+## Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```

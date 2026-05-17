@@ -417,3 +417,84 @@ cd frontend
 npm install
 npm run dev
 ```
+
+---
+
+# 🌍 Environment Variables
+
+Create a `.env` file inside backend:
+
+```env
+MONGO_URI=your_mongodb_connection_string
+PORT=5000
+```
+
+---
+
+# 📸 Dashboard Preview
+
+The dashboard includes:
+
+- Momentum summary cards
+- Technical analysis charts
+- Volume visualization
+- Market comparison
+- Financial indicators
+
+---
+
+# 🔮 Future Enhancements
+
+Possible future improvements:
+
+- Real-time stock APIs
+- AI-powered predictions
+- Portfolio management
+- News sentiment analysis
+- Candlestick charts
+- Authentication system
+- Watchlist feature
+- Cloud deployment
+
+---
+
+# 🧪 Educational Value
+
+This project demonstrates practical implementation of:
+
+- Financial analytics
+- Full-stack web development
+- Data visualization
+- Technical analysis systems
+- Real-world software engineering
+
+It can be used as:
+
+- Portfolio project
+- Academic project
+- FinTech case study
+- Analytics dashboard showcase
+
+ ---
+
+ # 👩‍💻 Author
+
+**Pooja Sukhdeve**  
+Master’s Student – Computer Science  
+Boston University Metropolitan College
+
+---
+
+# 📌 Conclusion
+
+Stock Momentum Analyzer is more than a stock dashboard.
+
+It represents a complete journey of:
+
+- Problem solving
+- Financial analytics
+- Full-stack engineering
+- Data-driven visualization
+- User-centered dashboard design
+
+The project demonstrates how modern web technologies can transform raw financial datasets into meaningful investment intelligence.

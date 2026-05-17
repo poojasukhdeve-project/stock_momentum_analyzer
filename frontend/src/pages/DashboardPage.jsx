@@ -663,37 +663,6 @@ export default function DashboardPage({
             )
           )}
 
-          {/* DATE PICKERS */}
-
-          <input
-            type="date"
-            value={fromDate}
-            onChange={e =>
-              setFromDate(
-                e.target.value
-              )
-            }
-            style={styles.select}
-          />
-
-          <input
-            type="date"
-            value={toDate}
-            onChange={e =>
-              setToDate(
-                e.target.value
-              )
-            }
-            style={styles.select}
-          />
-
-          <button
-            style={
-              styles.analyzeBtn
-            }
-          >
-            Analyze
-          </button>
 
         </div>
 

@@ -1,429 +1,163 @@
-# 📈 Stock Momentum Analyzer – AI-Driven Market Intelligence Dashboard
+# Stock Momentum Analyzer
 
-A full-stack financial analytics platform that transforms raw stock market data into interactive visual insights using technical indicators, momentum analytics, and responsive dashboard visualization.
+A full-stack financial analytics dashboard that turns raw stock market data into interactive momentum insights, technical indicators, and comparative visualizations — built to make market analysis accessible without prior financial expertise.
 
----
-
-# 🚀 Project Story
-
-In today’s fast-moving financial world, investors constantly struggle to understand market behavior.
-
-Most beginners visit multiple websites every day:
-
-- One website for stock prices
-- Another for technical charts
-- Another for RSI indicators
-- Another for financial news
-
-This process becomes overwhelming and inefficient.
-
-The goal of this project was simple:
-
-> Build a single intelligent dashboard where users can visually understand stock momentum and market trends in seconds.
-
-The Stock Momentum Analyzer was designed to solve this challenge by combining:
-
-- Financial analytics
-- Technical indicators
-- Interactive charts
-- Momentum scoring
-- Comparative market analysis
-
-into one modern and beginner-friendly dashboard.
+**Author:** Pooja Sukhdeve — Master's Student, Computer Science, Boston University Metropolitan College
 
 ---
 
-# 🎯 Problem Statement
+## Overview
 
-Traditional stock analysis platforms often suffer from:
+Beginner investors typically bounce between multiple tools to understand a single stock: one site for prices, another for charts, another for RSI, another for news. That fragmentation makes market analysis slow and confusing for anyone who isn't already fluent in financial jargon.
 
-- Complex user interfaces
-- Expensive subscriptions
-- Difficult financial terminology
-- Poor beginner accessibility
-- Lack of visual learning tools
-
-Investors need:
-
-✅ Simple dashboards  
-✅ Visual market insights  
-✅ Technical indicators  
-✅ Momentum analysis  
-✅ Fast decision-making support
-
-This project was developed to create a clean and responsive financial analytics system capable of transforming stock market data into actionable visual intelligence.
+Stock Momentum Analyzer consolidates that workflow into a single dashboard. It computes technical indicators (SMA, EMA, RSI), scores momentum, visualizes price and volume trends, and lets users compare multiple companies side by side — all through a clean, beginner-friendly interface.
 
 ---
 
-# 💡 Proposed Solution
+## Problem Statement
 
-The solution was to develop a full-stack stock analytics dashboard capable of:
+Existing stock analysis platforms tend to have:
 
-- Displaying stock price trends
-- Computing technical indicators
-- Visualizing volume analytics
-- Comparing multiple companies
-- Generating momentum insights
+- Complex, cluttered interfaces
+- Paywalled or subscription-only features
+- Heavy reliance on financial jargon
+- Little support for visual/beginner learning
 
-The platform provides a visual experience for understanding market behavior without requiring advanced financial knowledge.
-
----
-
-# 🏗 System Architecture
-
-## Frontend
-
-Built using:
-
-- React.js
-- Recharts
-- Axios
-- CSS
-
-### Responsibilities
-
-- Render charts
-- Display analytics dashboard
-- Handle API requests
-- Show technical indicators
-- Visualize market data
+This project set out to build something simpler: a free, visual-first dashboard that surfaces the indicators that matter and explains market behavior at a glance.
 
 ---
 
-## Backend
+## Features
 
-Built using:
-
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-
-### Responsibilities
-
-- Process stock market data
-- Compute indicators
-- Serve REST APIs
-- Handle database operations
-- Generate momentum analytics
-
----
-
-## Database
-
-MongoDB stores historical stock candle data including:
-
-- Open price
-- High price
-- Low price
-- Close price
-- Trading volume
-
----
-
-# 📊 Features
-
-## ✅ Momentum Dashboard
-
-Displays:
-
-- Momentum score
-- Return percentage
-- Bullish/Bearish trend
-- RSI analytics
-- Average gains/losses
-
----
-
-## ✅ Price Trend Visualization
-
-Interactive line charts display:
-
-- Close prices
-- SMA20
-- EMA20
-
-This helps users visually identify:
-
-- Uptrends
-- Downtrends
-- Trend reversals
-
----
-
-## ✅ Volume Bar Chart
-
-The dashboard includes trading volume analysis with visual bar charts.
-
-Volume helps investors understand:
-
-- Market activity
-- Trading participation
-- Bullish vs bearish pressure
-
----
-
-## ✅ Market Comparison
-
-Users can compare multiple companies:
-
-- AAPL
-- MSFT
-- TSLA
-- AMZN
-- GOOGL
-
-The comparison dashboard helps identify stronger-performing stocks.
-
----
-
-## ✅ Technical Indicators
-
-The backend computes:
-
-### SMA20
-Simple Moving Average over 20 trading days.
-
-### EMA20
-Exponential Moving Average for trend sensitivity.
-
-### RSI14
-Relative Strength Index for momentum analysis.
-
----
-
-# 🔍 Case Study Example
-
-## Scenario
-
-An investor wants to analyze Apple stock performance over the past year.
-
-### Workflow
-
-1. User selects AAPL
-2. Dashboard loads historical stock data
-3. Backend computes indicators
-4. Charts visualize market behavior
-5. Momentum summary provides analytics insights
-
----
-
-## Dashboard Observations
-
-### 📈 Price Trend
-The dashboard shows long-term bullish movement.
-
-### 📊 SMA20 & EMA20
-Moving averages help identify trend continuation.
-
-### 📉 RSI Analysis
-RSI helps identify:
-
-- Overbought zones
-- Oversold zones
-- Momentum strength
-
-### 📦 Volume Analysis
-Volume bars highlight periods of heavy market participation.
-
----
-
-# ⚙️ Technical Workflow
-
-## Step 1 – Data Collection
-
-Historical stock data is imported from CSV datasets.
-
----
-
-## Step 2 – Database Storage
-
-The backend stores stock candle data in MongoDB.
-
----
-
-## Step 3 – Indicator Computation
-
-The backend computes:
-
-- SMA
-- EMA
-- RSI
-- Momentum analytics
-
----
-
-## Step 4 – API Layer
-
-Express APIs serve processed financial analytics.
-
----
-
-## Step 5 – Frontend Visualization
-
-React components render charts and financial dashboards.
-
----
-
-# 🧩 Challenges Faced
-
-## 1. Volume Chart Rendering Issue
-
-Initially, volume bars were not visible because the indicator service removed volume fields during data transformation.
-
-### Solution
-
-The `computeIndicators()` service was updated to preserve:
-
-- open
-- high
-- low
-- close
-- volume
-
----
-
-## 2. Date Formatting Problems
-
-CSV datasets contained inconsistent date formats.
-
-### Solution
-
-Robust date normalization and formatting logic was implemented.
-
----
-
-## 3. Responsive Dashboard Layout
-
-Large charts caused UI overflow issues.
-
-### Solution
-
-Responsive layout design and Recharts container optimization were implemented.
-
----
-
-## 4. Technical Indicator Accuracy
-
-Financial calculations required defensive handling of invalid values.
-
-### Solution
-
-Validation and fallback logic were added for all indicators.
-
----
-
-# 📈 Learning Outcomes
-
-This project strengthened understanding of:
-
-## Frontend Development
-
-- React component architecture
-- Financial chart rendering
-- Responsive dashboard design
-- State management
-
----
-
-## Backend Development
-
-- REST API development
-- MongoDB integration
-- Data processing pipelines
-- Backend debugging
-
----
-
-## Financial Analytics
-
-- Technical indicators
-- Momentum analysis
-- Market visualization
-- Financial statistics
-
----
-
-## Full-Stack Integration
-
-- API communication
-- Frontend/backend synchronization
-- Real-world debugging workflows
-
----
-
-# 🛠 Technologies Used
-
-| Category | Technology |
+| Feature | Description |
 |---|---|
-| Frontend | React.js |
-| Charts | Recharts |
-| Backend | Node.js |
-| Framework | Express.js |
-| Database | MongoDB |
-| ODM | Mongoose |
-| HTTP Client | Axios |
-| Styling | CSS |
+| **Momentum Dashboard** | Momentum score, return %, bullish/bearish signal, RSI, average gains/losses |
+| **Price Trend Charts** | Interactive line charts for close price, SMA20, and EMA20 to spot trend direction and reversals |
+| **Volume Analysis** | Bar charts showing trading volume and participation |
+| **Market Comparison** | Side-by-side comparison across AAPL, MSFT, TSLA, AMZN, GOOGL |
+| **Technical Indicators** | Backend-computed SMA20, EMA20, and RSI14 |
 
 ---
 
-# 📁 Project Structure
+## System Architecture
 
-```bash
+**Frontend** — React.js, Recharts, Axios, CSS
+Renders charts and dashboards, handles API calls, displays indicators and market data.
+
+**Backend** — Node.js, Express.js, MongoDB, Mongoose
+Processes stock data, computes indicators, serves REST APIs, manages database operations.
+
+**Database** — MongoDB
+Stores historical OHLCV (open, high, low, close, volume) candle data.
+
+```
 stock_momentum_analyzer/
 │
 ├── backend/
-│   ├── src/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   └── index.js
+│   └── src/
+│       ├── models/
+│       ├── routes/
+│       ├── services/
+│       ├── utils/
+│       └── index.js
 │
 ├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── App.jsx
+│   └── src/
+│       ├── components/
+│       ├── pages/
+│       └── App.jsx
 │
 └── README.md
 ```
 
 ---
-# ▶️ Installation Guide
 
-## Clone Repository
+## How It Works: Example Workflow
 
+1. User selects a stock (e.g., AAPL)
+2. Dashboard fetches historical data from the backend
+3. Backend computes SMA, EMA, RSI, and momentum score
+4. Frontend renders price, volume, and indicator charts
+5. Momentum summary card gives an at-a-glance read on trend strength
+
+For AAPL specifically, the dashboard surfaces a long-term bullish price trend, SMA20/EMA20 crossovers marking trend continuation points, RSI readings flagging overbought/oversold zones, and volume spikes correlating with periods of heavier trading activity.
+
+---
+
+## Key Challenges & Solutions
+
+Building this project surfaced several real debugging and design problems worth documenting:
+
+### 1. Volume data silently disappearing
+**Problem:** Volume bars weren't rendering anywhere on the dashboard.
+**Root cause:** `computeIndicators()` was transforming OHLC data for SMA/EMA/RSI but dropping the `volume` field in the process — it wasn't being carried through to the output.
+**Fix:** Refactored the service to explicitly preserve `open`, `high`, `low`, `close`, and `volume` alongside the computed indicator fields.
+**Takeaway:** Data transformation pipelines need explicit field-preservation checks — it's easy for a "compute X" function to accidentally become a "compute X and lose everything else" function.
+
+### 2. Inconsistent date formats breaking charts
+**Problem:** CSV datasets from different sources used inconsistent date formats, which broke chart rendering and time-series alignment.
+**Fix:** Built a normalization layer that parses and standardizes all incoming dates before they hit the database.
+**Takeaway:** Real-world data is messy by default — normalization at the ingestion boundary saves a lot of downstream pain.
+
+### 3. Charts overflowing on smaller screens
+**Problem:** Large Recharts components caused layout overflow on smaller viewports.
+**Fix:** Implemented responsive containers and CSS layout adjustments so charts resize correctly across screen sizes.
+**Takeaway:** Charting libraries need explicit responsive configuration — they don't gracefully handle constrained space by default.
+
+### 4. Indicator calculations breaking on bad data
+**Problem:** Missing or invalid price values caused SMA/EMA/RSI calculations to return incorrect or `NaN` results.
+**Fix:** Added validation and fallback logic so indicators degrade gracefully instead of silently producing wrong numbers.
+**Takeaway:** Financial calculations need defensive coding — a wrong number that looks plausible is more dangerous than an obvious crash.
+
+---
+
+## What I Learned
+
+**Frontend:** React component architecture, financial chart rendering with Recharts, responsive dashboard design, state management.
+
+**Backend:** REST API design, MongoDB/Mongoose integration, building data-processing pipelines, systematic backend debugging.
+
+**Financial Analytics:** How SMA, EMA, and RSI are calculated and interpreted; what momentum scoring actually captures; how to visualize market behavior meaningfully.
+
+**Full-Stack Integration:** Keeping frontend and backend in sync, handling real API communication, and debugging issues that span both layers rather than living in one file.
+
+---
+
+## Tech Stack
+
+| Category | Technology |
+|---|---|
+| Frontend | React.js |
+| Charts | Recharts |
+| Backend | Node.js, Express.js |
+| Database | MongoDB, Mongoose |
+| HTTP Client | Axios |
+| Styling | CSS |
+
+---
+
+## Getting Started
+
+**Clone the repo**
 ```bash
 git clone <repository-url>
 ```
 
----
-
-## Backend Setup
-
+**Backend setup**
 ```bash
 cd backend
 npm install
 npm run dev
 ```
 
----
-
-## Frontend Setup
-
+**Frontend setup**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
----
-
-# 🌍 Environment Variables
-
-Create a `.env` file inside backend:
-
+**Environment variables** — create a `.env` file in `backend/`:
 ```env
 MONGO_URI=your_mongodb_connection_string
 PORT=5000
@@ -431,70 +165,23 @@ PORT=5000
 
 ---
 
-# 📸 Dashboard Preview
+## Future Enhancements
 
-The dashboard includes:
-
-- Momentum summary cards
-- Technical analysis charts
-- Volume visualization
-- Market comparison
-- Financial indicators
-
----
-
-# 🔮 Future Enhancements
-
-Possible future improvements:
-
-- Real-time stock APIs
-- AI-powered predictions
-- Portfolio management
+- Real-time stock price APIs
+- AI-powered price predictions
+- Portfolio tracking and management
 - News sentiment analysis
-- Candlestick charts
-- Authentication system
+- Candlestick chart view
+- User authentication
 - Watchlist feature
 - Cloud deployment
 
 ---
 
-# 🧪 Educational Value
+## Why This Project
 
-This project demonstrates practical implementation of:
+This was primarily a learning exercise in fetching, processing, and visualizing real-world data end to end — not a production trading tool. It's a useful reference point for:
 
-- Financial analytics
-- Full-stack web development
-- Data visualization
-- Technical analysis systems
-- Real-world software engineering
-
-It can be used as:
-
-- Portfolio project
-- Academic project
+- Portfolio / academic project
 - FinTech case study
-- Analytics dashboard showcase
-
- ---
-
- # 👩‍💻 Author
-
-**Pooja Sukhdeve**  
-Master’s Student – Computer Science  
-Boston University Metropolitan College
-
----
-
-# 📌 Conclusion
-
-Stock Momentum Analyzer is more than a stock dashboard.
-
-It represents a complete journey of:
-
-- Problem solving
-- Financial analytics
-- Full-stack engineering
-- Data-driven visualization
-- User-centered dashboard design
-
-The project demonstrates how modern web technologies can transform raw financial datasets into meaningful investment intelligence.
+- Practicing full-stack data pipelines and dashboard design
